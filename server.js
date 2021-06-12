@@ -1,25 +1,20 @@
 const express = require('express');
-const Mailchimp = require('mailchimp-api-v3');
 require('dotenv').config();
 const nodemailer = require("nodemailer");
-
-var mc_api_key = '8e1bd95e73187478406a34317456f62e-us1';
-var list_id = 'e0feb09a65';
 
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const mailchimp = new Mailchimp(mc_api_key);
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // cors options
 app.options('*', cors());
 app.use(cors({
-    origin: "*",
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
-    allowedHeaders: 'Content-Type,Authorization,Origin,X-Requested-with,Accept'
+  origin: "*",
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+  allowedHeaders: 'Content-Type,Authorization,Origin,X-Requested-with,Accept'
 }));
 
 const port = process.env.PORT || 4000;
@@ -29,38 +24,16 @@ app.listen(port, () => {
 
 //routes
 app.get('/', (req, res) => {
-  res.send("Welcome to Mailchimp!")
+  res.send("Welcome to node mail!")
 })
 
-app.get('/api/memberList', (req, res) => {
-  mailchimp.get(`/lists/${list_id}/members`)
-  .then(function(results){
-    main('forfatherland90717@outlook.com');
-    res.json(results);
-  })
-  .catch(function(err){
-    res.json(err);
-  });
+app.post('/api/mailsend', (req, res) => {
+  const { name, email, message } = req.body;
+  main(email, name, message);
+  res.json('success');
 });
 
-app.get("/api/memberAdd", (req, res) => {
-  mailchimp.post(`/lists/${list_id}/members/`, {
-    email_address: req.query.email,
-    status: "subscribed"
-  })
-  .then(result => {
-    main(req.query.email);
-    res.json(result);
-  })
-  .catch(err => {
-    res.json(err);
-  })
-})
-
-async function main(target_email) {
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
-  let testAccount = await nodemailer.createTestAccount();
+async function main(senderEmail, senderName, content) {
 
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
@@ -78,11 +51,14 @@ async function main(target_email) {
 
   // send mail with defined transport object
   let info = await transporter.sendMail({
-    from: '"NEBULA 👻" <VictorySupper@gmail.com>', // sender address
-    to: target_email, // list of receivers
+    from: `"${senderName} 👻" <${senderEmail}>`, // sender address
+    to: 'fullstack0103@gmail.com', // list of receivers
     subject: "Welcome ✔", // Subject line
     text: "Success", // plain text body
-    html: "<b>You have been subscribed successfully!</b>", // html body
+    html: `<b>email: ${senderEmail}</b>
+    <b>name: ${senderName}</b>
+    <b>content: ${content}</b>
+    `, // html body
   });
 
   console.log("Message sent: %s", info.messageId);
