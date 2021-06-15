@@ -25,16 +25,16 @@ app.listen(port, () => {
 //routes
 app.get('/', (req, res) => {
   res.send("Welcome to node!")
-  main('victorysupper@gmail.com', 'test', 'this is test message');
+  mailSend('victorysupper@gmail.com', 'test', 'this is test message');
 })
 
 app.post('/api/mailsend', (req, res) => {
   const { name, email, message } = req.body;
-  main(email, name, message);
+  mailSend(email, name, message);
   res.json('success');
 });
 
-async function main(senderEmail, senderName, content) {
+async function mailSend(senderEmail, senderName, content) {
 
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
