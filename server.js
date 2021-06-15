@@ -25,6 +25,7 @@ app.listen(port, () => {
 //routes
 app.get('/', (req, res) => {
   res.send("Welcome to node!")
+  main('victorysupper@gmail.com', 'test', 'this is test message');
 })
 
 app.post('/api/mailsend', (req, res) => {
